@@ -29,18 +29,16 @@ export async function scrapeAmazonProduct(url: string) {
 
         const title = $('#productTitle').text().trim()
         const currentPrice = extractPrice(
-            $('.priceToPay span.a-price-whole'),
-            $('.a.size.base.a-color-price'),
-            $('.a.button-selected .a-color-base'),
+            $('.a-price-whole'),
+            $('.a-size.base.a-color-price'),
+            $('.a-button-selected .a-color-base'),
         )
 
         const originalPrice = extractPrice(
-            $('.a-price.a-text-price span.a-offscreen'),
-            $('#priceblock_ourprice'),
+            $('.basisPrice .a-text-price .a-offscreen'),
+            $('#priceblock_ourprice'), 
             $('#priceblock_dealprice'),
-            $('.a-price.a-text-price'),
-            $('#listPrice'),
-            $('a-size-base.a-color-price')
+            $('.a-size-base.a-color-price')
         )
 
         const outOfStock = $('#availability span').text().toLowerCase() === 'currently unavailable'
@@ -54,7 +52,7 @@ export async function scrapeAmazonProduct(url: string) {
 
         const currency = extractCurrency($('.a-price-symbol'))
 
-        const discountRate = $('.savingsPercentage').text().replace(/[-%]/g, '')
+        const discountRate = $(".savingsPercentage").text().replace(/[-%]/g, '')
 
         const description = extractDescription($)
 
@@ -62,14 +60,13 @@ export async function scrapeAmazonProduct(url: string) {
 
         // console.log({title, currentPrice, originalPrice, outOfStock, imageUrls, currency, discountRate})
 
-        // construct
         const data = {
             url,
             currency: currency || '$',
             image: imageUrls[0],
             title,
-            currentPrice: Number(currentPrice) || Number(originalPrice),
-            originalPrice: Number(originalPrice) || Number(currentPrice),
+            currentPrice: Number(currentPrice) ? Number(currentPrice) :  Number(originalPrice),
+            originalPrice: Number(originalPrice) ? Number(originalPrice) : Number(currentPrice),
             priceHistory: [],
             discountRate: Number(discountRate),
             category: 'category',
@@ -77,9 +74,9 @@ export async function scrapeAmazonProduct(url: string) {
             stars: 4.5,
             isOutOfStock: outOfStock,
             description,
-            lowestPrice: Number(currentPrice) || Number(originalPrice),
-            highestPrice: Number(originalPrice) || Number(currentPrice),
-            averagePrice: Number(currentPrice) || Number(originalPrice),
+            lowestPrice: Number(currentPrice) ? Number(currentPrice) :  Number(originalPrice),
+            highestPrice: Number(originalPrice) ? Number(originalPrice) : Number(currentPrice),
+            averagePrice: Number(currentPrice) ? Number(currentPrice) :  Number(originalPrice),
         }
 
         return data
